@@ -12,6 +12,14 @@
   background: rgba(47, 111, 237, 0.16);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6);
 }
+.pinclick-ring::after {
+  content: attr(data-step);
+  position: absolute; top: -9px; left: -9px;
+  min-width: 18px; height: 18px; padding: 0 4px;
+  border-radius: 9px; background: #16b364; color: #fff;
+  font: 700 11px/18px -apple-system, system-ui, sans-serif; text-align: center;
+}
+.pinclick-ring[data-step=""]::after { display: none; }
 .pinclick-ring {
   display: none;
   border: 2px solid #16b364;

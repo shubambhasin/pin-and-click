@@ -160,7 +160,8 @@
   <p class="sub">
     Every other auto clicker hammers a coordinate. Pin&nbsp;&amp;&nbsp;Click pins the
     <em>element</em> — so when the page re-renders, swaps class names, or reloads
-    entirely, it's still clicking the right thing.
+    entirely, it's still clicking the right thing. Chain a few buttons into a
+    sequence, and tell it when to stop.
   </p>
   <div class="cta">
     <a class="btn primary" href="/pin-and-click.zip" download>
@@ -178,6 +179,8 @@
     This is the extension's actual scheduler running on this page. The button below
     <b style="color:var(--ink)">destroys and rebuilds itself every 500ms</b> with new
     class names — exactly what a React re-render does. Watch the count keep climbing.
+    <br /><span style="color:#6f7783;font-size:14px">Single target only here — sequences and stop
+    conditions need the real extension, since they act on a whole page.</span>
   </p>
   <div class="card demo">
     <div class="stage">
@@ -210,6 +213,14 @@
   <h2>Why it keeps working</h2>
   <p class="lede">Three fallbacks, re-evaluated on every single click.</p>
   <div class="grid">
+    <div class="card feat"><i>🪜</i><h3>Sequences, not just one button</h3>
+      <p>Pin several buttons and they're clicked top to bottom, then looped — enough to drive a real flow like cart → checkout → confirm.</p></div>
+    <div class="card feat"><i>⏳</i><h3>Waits for the next step</h3>
+      <p>If step 2 isn't on the page yet, it waits instead of skipping — because step 2 usually only appears <em>because</em> step 1 was clicked. Stuck 30s? It stops and says which step.</p></div>
+    <div class="card feat"><i>🛑</i><h3>Knows when to stop</h3>
+      <p>After N clicks, after N seconds, when text like <code>Sold out</code> appears, or when the button disappears. However it ends, it tells you why.</p></div>
+    <div class="card feat"><i>📊</i><h3>Sent vs skipped</h3>
+      <p>Counts clicks it sent and ones it skipped — with the reason: the button was <code>covered</code> by an overlay, or <code>disabled</code>. The fastest way to see why nothing's happening.</p></div>
     <div class="card feat"><i>📌</i><h3>Pinned to the element</h3>
       <p>Prefers stable hooks — <code>id</code>, <code>data-testid</code>, <code>aria-label</code> — over brittle structural paths, so the selector survives a redesign.</p></div>
     <div class="card feat"><i>🔁</i><h3>Survives re-renders</h3>
@@ -242,7 +253,7 @@
     <div class="card step"><div><h4>Load unpacked</h4>
       <p>Click <b style="color:var(--ink)">Load unpacked</b>, select the unzipped folder, then pin ⚡ to your toolbar. Done.</p></div></div>
     <div class="card step"><div><h4>Pick a target and go</h4>
-      <p>Open the popup → <b style="color:var(--ink)">🎯 Pick target on page</b> → click your button → <b style="color:var(--ink)">Start</b>. <code>Esc</code> cancels picking.</p></div></div>
+      <p>Open the popup → <b style="color:var(--ink)">🎯 Pick a button on the page</b> → click it → <b style="color:var(--ink)">Start</b>. Add more buttons to build a sequence. <code>Esc</code> cancels picking.</p></div></div>
   </div>
 </div></section>
 

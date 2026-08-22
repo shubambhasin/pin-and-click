@@ -2,45 +2,60 @@
 <meta charset="utf-8" />
 <link rel="stylesheet" href="popup.css" />
 <div class="wrap">
+
   <div class="head">
     <span class="dot" id="dot"></span>
     <b>Pin &amp; Click</b>
     <span class="state" id="state">idle</span>
   </div>
 
-  <button id="pick" class="btn ghost">🎯 Pick target on page</button>
-  <div class="target" id="target">No target selected</div>
-
-  <label class="row">
-    <span>Speed</span>
-    <input type="range" id="cps" min="1" max="100" step="1" value="50" />
-    <output id="cpsOut">50/s</output>
-  </label>
-  <div class="presets">
-    <button data-cps="10">10</button>
-    <button data-cps="25">25</button>
-    <button data-cps="50">50</button>
-    <button data-cps="100">100</button>
+  <!-- 1. what to click -->
+  <div class="block">
+    <div class="blockHead">What to click</div>
+    <ol class="steps" id="steps"></ol>
+    <button id="pick" class="btn ghost">🎯 <span id="pickLabel">Pick a button on the page</span></button>
+    <div class="hint" id="seqHint" hidden>
+      Clicked top to bottom, then loops. If a step isn't on the page yet, it waits for it.
+    </div>
   </div>
 
-  <div class="opts">
+  <!-- 2. how fast -->
+  <div class="block">
+    <div class="blockHead">How fast</div>
+    <label class="row">
+      <span class="rowLabel">Speed</span>
+      <input type="range" id="cps" min="1" max="100" step="1" value="50" />
+      <output id="cpsOut">50/s</output>
+    </label>
     <label class="chk">
       <input type="checkbox" id="burst" checked />
-      <span>Pause after every</span>
-      <input type="number" id="burstSize" min="1" max="9999" value="25" />
-      <span>clicks for</span>
-      <input type="number" id="burstPause" min="0" max="60000" step="50" value="500" />
-      <span>ms</span>
+      <span>Pause <input type="number" id="burstPause" min="0" max="60000" step="50" value="500" />ms every
+      <input type="number" id="burstSize" min="1" max="9999" value="25" />clicks</span>
     </label>
-    <label class="chk">
-      <input type="checkbox" id="jitter" />
-      <span>Jitter gaps ±20% (less bot-like)</span>
-    </label>
-    <div class="eff" id="eff"></div>
+    <label class="chk"><input type="checkbox" id="jitter" /> <span>Vary the timing slightly</span></label>
+    <div class="sub" id="eff"></div>
+  </div>
+
+  <!-- 3. when to stop -->
+  <div class="block">
+    <div class="blockHead">When to stop</div>
+    <select id="stopMode">
+      <option value="manual">When I press stop</option>
+      <option value="clicks">After a number of clicks</option>
+      <option value="seconds">After a number of seconds</option>
+      <option value="text">When some text appears</option>
+      <option value="gone">When the button disappears</option>
+    </select>
+    <div class="row extra" id="extraWrap" hidden>
+      <input type="number" id="stopClicks" min="1" max="999999" value="100" hidden />
+      <input type="number" id="stopSeconds" min="1" max="86400" value="30" hidden />
+      <input type="text" id="stopText" placeholder="e.g. Sold out" hidden />
+    </div>
   </div>
 
   <button id="toggle" class="btn primary" disabled>Start clicking</button>
-  <button id="clear" class="btn tiny">Clear target</button>
-  <div class="hint">Esc cancels picking · Alt+Shift+C toggles</div>
+
+  <div class="tally" id="tally"></div>
+  <div class="hint foot">Esc cancels picking · Alt+Shift+C starts/stops</div>
 </div>
 <script src="popup.js"></script>

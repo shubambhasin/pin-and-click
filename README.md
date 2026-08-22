@@ -18,6 +18,46 @@ brand-new DOM node, or reloads entirely.
 3. Set speed (default 50/s) → **Start clicking**
 4. `Alt+Shift+C` toggles start/stop. Green pill bottom-right shows the live click count.
 
+## Click a sequence, not just one button
+
+Add more than one target and they're clicked **top to bottom, then looped** — enough to
+drive a real flow (add to cart → checkout → confirm). Two things make it work without
+any extra configuration:
+
+- **It waits for a step.** If step 2 isn't on the page yet, it waits for it instead of
+  skipping ahead — which is exactly what you want, since step 2 usually only appears
+  *because* step 1 was clicked.
+- **It gives up sanely.** If a step never shows up within 30s it stops and tells you
+  which one it was stuck on, instead of spinning silently forever.
+
+The HUD ring shows a numbered badge for the step being clicked right now.
+
+## Knowing when to stop
+
+Pick one from the **When to stop** dropdown:
+
+| Option | Stops when |
+| --- | --- |
+| When I press stop | never — the default |
+| After a number of clicks | the count is reached |
+| After a number of seconds | the time is up |
+| When some text appears | that text shows up anywhere on the page (`Sold out`, `Order placed`) |
+| When the button disappears | no target can be resolved any more |
+
+However it stops, the reason is shown in the popup and the on-page HUD.
+
+## Sent vs skipped
+
+The popup tallies **sent** clicks and **skipped** ones, with the reason. A click is
+skipped when the element is there but a real click wouldn't have landed either:
+
+- `covered` — something else (a modal, an overlay, a sticky header) is on top of it
+- `disabled` — the element is `disabled` or `aria-disabled="true"`
+
+That's the honest limit of what a page can tell you: whether the app actually *acted* on
+a click isn't observable from the outside, so nothing here pretends to measure it. A
+climbing `skipped` count is still the fastest way to see why nothing is happening.
+
 ## How the target survives page changes
 Three fallbacks, in order, each tick:
 1. stored CSS selector (prefers `id`, `data-testid`, `aria-label`, `name` over structural paths)
