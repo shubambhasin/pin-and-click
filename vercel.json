@@ -1,5 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "sh scripts/build-zip.sh",
+  "outputDirectory": "site",
   "headers": [
     {
       "source": "/pin-and-click.zip",

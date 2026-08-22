@@ -7,6 +7,21 @@ Pick an element once, then click it up to 100×/second. The target is re-resolve
 on **every** tick, so it keeps working when the page re-renders the button as a
 brand-new DOM node, or reloads entirely.
 
+## Repo layout & deploys
+
+| Path | What it is |
+| --- | --- |
+| `manifest.json`, `*.js`, `*.css`, `popup.html` | the extension itself |
+| `native/` | the OS-level clicker (Swift + CoreGraphics) |
+| `site/` | the landing page — the deploy's output directory |
+| `scripts/build-zip.sh` | packages the extension into `site/pin-and-click.zip` |
+
+The download offered on the landing page is **built at deploy time**, not committed:
+Vercel is linked to this repo and runs `scripts/build-zip.sh` (per `vercel.json`) on every
+push to `main`, so the zip can never drift from the source in that commit. Push and the
+site updates itself; no token is stored anywhere. Run the same script locally to get an
+identical zip for `Load unpacked`.
+
 ## Install
 1. `chrome://extensions` → enable **Developer mode**
 2. **Load unpacked** → select this folder
