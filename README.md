@@ -1,5 +1,8 @@
 # Pin & Click — fast auto clicker (Chrome MV3)
 
+**→ [pin-and-click.vercel.app](https://pin-and-click.vercel.app)** — landing page with a live
+in-browser demo of the click scheduler, and a one-click `.zip` download.
+
 Pick an element once, then click it up to 100×/second. The target is re-resolved
 on **every** tick, so it keeps working when the page re-renders the button as a
 brand-new DOM node, or reloads entirely.

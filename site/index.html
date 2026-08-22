@@ -20,7 +20,7 @@
   body {
     margin: 0; background: var(--bg); color: var(--ink);
     font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
   a { color: inherit; }
   .wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 22px; }
@@ -38,7 +38,10 @@
   @media (max-width: 620px) { nav .links { display: none; } }
 
   /* ---------- hero ---------- */
-  header { position: relative; padding: 84px 0 64px; text-align: center; }
+  /* overflow:hidden here (not on body) contains the glow below — html is the
+     scroll container, so body{overflow-x} never clipped it. nav is outside
+     header, so its position:sticky is unaffected. */
+  header { position: relative; padding: 84px 0 64px; text-align: center; overflow: hidden; }
   header::before {
     content: ""; position: absolute; inset: -30% 0 auto 50%; transform: translateX(-50%);
     width: 900px; height: 620px; pointer-events: none;
@@ -180,7 +183,7 @@
     <div class="stage">
       <div id="host"></div>
       <div class="count" id="count">0<small>clicks landed · <span id="lost">0</span> missed</small></div>
-      <div class="rerender">↻ button node replaced <b id="renders">0</b> times</div>
+      <div class="rerender">↻ button node replaced <b id="renders">0</b> times <span id="idle">— press start, it rebuilds every 500ms</span></div>
     </div>
     <div class="panel">
       <div class="ctl">
@@ -297,7 +300,15 @@
     });
   }
   render();
-  setInterval(render, 500);   // nuke + rebuild, forever
+  // Only churn the DOM while the demo is actually running, and never while the
+  // tab is hidden — a forever-looping re-render burns the visitor's CPU for nothing.
+  let renderTimer = null;
+  const startRender = () => { if (!renderTimer) renderTimer = setInterval(render, 500); };
+  const stopRender  = () => { clearInterval(renderTimer); renderTimer = null; };
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { stopRender(); clearTimeout(timer); }
+    else if (running) { startRender(); loop(); }
+  });
 
   const visible = (el) => { if (!el || !el.isConnected) return false;
     const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
@@ -359,9 +370,11 @@
 
   $('run').onclick = () => {
     running = !running;
-    if (running) { inBurst = 0; pausing = false; loop(); }
-    else { clearTimeout(timer); document.querySelectorAll('.hot').forEach(e => e.classList.remove('hot')); }
+    if (running) { inBurst = 0; pausing = false; startRender(); loop(); }
+    else { clearTimeout(timer); stopRender();
+           document.querySelectorAll('.hot').forEach(e => e.classList.remove('hot')); }
     $('run').textContent = running ? 'Stop' : 'Start clicking';
+    $('idle').style.display = running ? 'none' : '';
     $('run').style.background = running ? '#e5484d' : '';
     $('run').style.color = running ? '#fff' : '';
   };
