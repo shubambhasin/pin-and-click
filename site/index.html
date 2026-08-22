@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pin &amp; Click — the auto clicker that doesn't lose the button</title>
+<meta name="description" content="A Chrome extension that pins the element, not the pixel. Click any button up to 100×/second, with burst pauses that keep pages and APIs from dropping clicks." />
+<meta property="og:title" content="Pin & Click — the auto clicker that doesn't lose the button" />
+<meta property="og:description" content="Pins the element, not the pixel. Up to 100 clicks/sec, burst mode, and real OS-level clicks when synthetic ones aren't enough." />
+<meta name="theme-color" content="#0b0c0f" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --bg: #0b0c0f; --panel: #14161b; --line: #23262e; --ink: #f2f4f8; --dim: #9ba3b0;
+    --acc: #16b364; --acc2: #2f6fed; --radius: 14px;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  a { color: inherit; }
+  .wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 22px; }
+
+  /* ---------- nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px);
+    background: rgba(11,12,15,.72); border-bottom: 1px solid var(--line);
+  }
+  nav .wrap { display: flex; align-items: center; gap: 14px; height: 60px; }
+  .logo { display: flex; align-items: center; gap: 9px; font-weight: 700; letter-spacing: -.2px; }
+  .logo i { font-style: normal; font-size: 19px; }
+  nav .links { margin-left: auto; display: flex; gap: 20px; font-size: 14px; color: var(--dim); }
+  nav .links a:hover { color: var(--ink); }
+  @media (max-width: 620px) { nav .links { display: none; } }
+
+  /* ---------- hero ---------- */
+  header { position: relative; padding: 84px 0 64px; text-align: center; }
+  header::before {
+    content: ""; position: absolute; inset: -30% 0 auto 50%; transform: translateX(-50%);
+    width: 900px; height: 620px; pointer-events: none;
+    background: radial-gradient(closest-side, rgba(22,179,100,.16), transparent 70%);
+  }
+  .tag {
+    display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--dim);
+    border: 1px solid var(--line); background: var(--panel);
+    padding: 6px 13px; border-radius: 999px; margin-bottom: 22px;
+  }
+  .tag b { color: var(--acc); font-weight: 600; }
+  h1 {
+    font-size: clamp(34px, 6.2vw, 62px); line-height: 1.04; margin: 0 0 18px;
+    letter-spacing: -1.8px; font-weight: 800;
+  }
+  h1 span { background: linear-gradient(96deg, var(--acc), #6ee7a8 60%, var(--acc2));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { max-width: 620px; margin: 0 auto 32px; color: var(--dim); font-size: clamp(15px, 2vw, 18.5px); }
+  .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px; text-decoration: none; cursor: pointer;
+    padding: 14px 24px; border-radius: 11px; font-weight: 650; font-size: 15px; border: 1px solid transparent;
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn.primary { background: var(--acc); color: #05210f; box-shadow: 0 8px 26px -8px rgba(22,179,100,.7); }
+  .btn.primary:hover { background: #14c46c; }
+  .btn.ghost { border-color: var(--line); background: var(--panel); color: var(--ink); }
+  .btn.ghost:hover { border-color: #39404d; }
+  .note { margin-top: 15px; font-size: 12.5px; color: #6f7783; }
+
+  /* ---------- demo ---------- */
+  section { padding: 58px 0; }
+  h2 { font-size: clamp(24px, 3.4vw, 34px); letter-spacing: -.9px; margin: 0 0 10px; font-weight: 750; }
+  .lede { color: var(--dim); max-width: 640px; margin: 0 0 30px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+
+  .demo { display: grid; grid-template-columns: 1.05fr .95fr; gap: 0; overflow: hidden; }
+  @media (max-width: 760px) { .demo { grid-template-columns: 1fr; } }
+  .stage {
+    padding: 30px; display: grid; place-items: center; gap: 18px; text-align: center;
+    border-right: 1px solid var(--line); position: relative; min-height: 260px;
+  }
+  @media (max-width: 760px) { .stage { border-right: 0; border-bottom: 1px solid var(--line); } }
+  #hitbox {
+    position: relative; padding: 17px 30px; font: 650 16px/1 inherit; cursor: pointer;
+    border-radius: 11px; border: 1px solid #2c313b; background: #1b1f26; color: var(--ink);
+    transition: box-shadow .12s, border-color .12s;
+  }
+  #hitbox.hot { border-color: var(--acc); box-shadow: 0 0 0 4px rgba(22,179,100,.18); }
+  .count { font: 800 46px/1 var(--mono); letter-spacing: -2px; font-variant-numeric: tabular-nums; }
+  .count small { display: block; font: 500 12px/1.4 inherit; color: var(--dim); letter-spacing: 0; margin-top: 7px; }
+  .rerender { font-size: 11.5px; color: #6f7783; }
+  .panel { padding: 26px 28px; display: grid; gap: 15px; align-content: start; }
+  .ctl { display: grid; gap: 6px; }
+  .ctl .lbl { display: flex; justify-content: space-between; font-size: 13px; color: var(--dim); }
+  .ctl .lbl b { color: var(--ink); font-family: var(--mono); font-weight: 600; }
+  input[type=range] { width: 100%; accent-color: var(--acc); }
+  .chk { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--dim); cursor: pointer; }
+  .chk input { accent-color: var(--acc); width: 15px; height: 15px; }
+  #run { width: 100%; justify-content: center; }
+  .avg { font-size: 12px; color: #6f7783; font-family: var(--mono); min-height: 17px; }
+
+  /* ---------- features ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); gap: 15px; }
+  .feat { padding: 22px; }
+  .feat i { font-style: normal; font-size: 21px; display: block; margin-bottom: 11px; }
+  .feat h3 { margin: 0 0 6px; font-size: 15.5px; font-weight: 650; letter-spacing: -.2px; }
+  .feat p { margin: 0; color: var(--dim); font-size: 13.8px; line-height: 1.55; }
+
+  /* ---------- install ---------- */
+  .steps { display: grid; gap: 12px; counter-reset: s; }
+  .step { display: flex; gap: 15px; padding: 18px 20px; align-items: flex-start; }
+  .step::before {
+    counter-increment: s; content: counter(s);
+    flex: 0 0 27px; height: 27px; border-radius: 8px; background: #1e222a; color: var(--acc);
+    display: grid; place-items: center; font: 700 13px/1 var(--mono); border: 1px solid var(--line);
+  }
+  .step div { flex: 1; }
+  .step h4 { margin: 2px 0 4px; font-size: 14.5px; font-weight: 650; }
+  .step p { margin: 0; color: var(--dim); font-size: 13.5px; }
+  code {
+    font: 500 12.5px/1.5 var(--mono); background: #1e222a; border: 1px solid var(--line);
+    padding: 2px 6px; border-radius: 5px; color: #cfe9db; white-space: nowrap;
+  }
+  pre { margin: 12px 0 0; padding: 15px 17px; overflow-x: auto; background: #10131a;
+        border: 1px solid var(--line); border-radius: 10px; }
+  pre code { background: none; border: 0; padding: 0; white-space: pre; color: #cfe9db; }
+
+  .warn { border-left: 3px solid #e5a23d; padding: 16px 20px; font-size: 13.5px; color: var(--dim); }
+  .warn b { color: var(--ink); }
+
+  footer { border-top: 1px solid var(--line); padding: 34px 0; color: #6f7783; font-size: 13px; }
+  footer .wrap { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+  footer a { color: var(--dim); text-decoration: none; }
+  footer a:hover { color: var(--ink); }
+  footer .sp { margin-left: auto; }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <span class="logo"><i>⚡</i> Pin &amp; Click</span>
+  <span class="links">
+    <a href="#demo">Demo</a>
+    <a href="#features">Features</a>
+    <a href="#install">Install</a>
+    <a href="#native">Native clicks</a>
+    <a href="https://github.com/shubambhasin/pin-and-click">GitHub</a>
+  </span>
+</div></nav>
+
+<header><div class="wrap">
+  <span class="tag">⚡ <b>up to 100 clicks/sec</b> · MV3 · open source</span>
+  <h1>The auto clicker that<br /><span>doesn't lose the button</span></h1>
+  <p class="sub">
+    Every other auto clicker hammers a coordinate. Pin&nbsp;&amp;&nbsp;Click pins the
+    <em>element</em> — so when the page re-renders, swaps class names, or reloads
+    entirely, it's still clicking the right thing.
+  </p>
+  <div class="cta">
+    <a class="btn primary" href="/pin-and-click.zip" download>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Add to Chrome
+    </a>
+    <a class="btn ghost" href="https://github.com/shubambhasin/pin-and-click">View source</a>
+  </div>
+  <p class="note">Not on the Web Store — downloads a .zip you load unpacked. 30 seconds, <a href="#install" style="color:var(--dim)">3 steps below</a>.</p>
+</div></header>
+
+<section id="demo"><div class="wrap">
+  <h2>Try the engine, right here</h2>
+  <p class="lede">
+    This is the extension's actual scheduler running on this page. The button below
+    <b style="color:var(--ink)">destroys and rebuilds itself every 500ms</b> with new
+    class names — exactly what a React re-render does. Watch the count keep climbing.
+  </p>
+  <div class="card demo">
+    <div class="stage">
+      <div id="host"></div>
+      <div class="count" id="count">0<small>clicks landed · <span id="lost">0</span> missed</small></div>
+      <div class="rerender">↻ button node replaced <b id="renders">0</b> times</div>
+    </div>
+    <div class="panel">
+      <div class="ctl">
+        <span class="lbl">Speed <b><span id="cpsOut">50</span>/s</b></span>
+        <input type="range" id="cps" min="1" max="100" value="50" />
+      </div>
+      <div class="ctl">
+        <span class="lbl">Burst size <b><span id="bsOut">25</span> clicks</b></span>
+        <input type="range" id="bs" min="1" max="100" value="25" />
+      </div>
+      <div class="ctl">
+        <span class="lbl">Pause between bursts <b><span id="bpOut">500</span>ms</b></span>
+        <input type="range" id="bp" min="0" max="2000" step="50" value="500" />
+      </div>
+      <label class="chk"><input type="checkbox" id="burst" checked /> Burst mode (avoid throttling)</label>
+      <label class="chk"><input type="checkbox" id="jitter" /> Jitter gaps ±20%</label>
+      <div class="avg" id="avg"></div>
+      <button class="btn primary" id="run">Start clicking</button>
+    </div>
+  </div>
+</div></section>
+
+<section id="features"><div class="wrap">
+  <h2>Why it keeps working</h2>
+  <p class="lede">Three fallbacks, re-evaluated on every single click.</p>
+  <div class="grid">
+    <div class="card feat"><i>📌</i><h3>Pinned to the element</h3>
+      <p>Prefers stable hooks — <code>id</code>, <code>data-testid</code>, <code>aria-label</code> — over brittle structural paths, so the selector survives a redesign.</p></div>
+    <div class="card feat"><i>🔁</i><h3>Survives re-renders</h3>
+      <p>If the selector dies, it matches on tag + visible text. Catches React and Vue swapping in a brand-new node with shuffled classes.</p></div>
+    <div class="card feat"><i>🎯</i><h3>Position as last resort</h3>
+      <p>Still nothing? It falls back to the last-known viewport point via <code>elementFromPoint</code>. Three chances to find your button.</p></div>
+    <div class="card feat"><i>⏸️</i><h3>Burst mode</h3>
+      <p>N clicks, then a breather. A flat 50/s stream gets coalesced by the page and 429'd by the backend — bursts land more <em>real</em> clicks than a faster stream does.</p></div>
+    <div class="card feat"><i>🎲</i><h3>Jitter</h3>
+      <p>Randomises every gap by ±20% so the cadence isn't machine-perfect.</p></div>
+    <div class="card feat"><i>💾</i><h3>Auto-resume</h3>
+      <p>Target and settings are saved per page. Reload, and it picks up clicking where it left off.</p></div>
+    <div class="card feat"><i>🖼️</i><h3>Works in iframes</h3>
+      <p>Runs in every frame; whichever frame catches your pick claims the target.</p></div>
+    <div class="card feat"><i>⌨️</i><h3>Keyboard + HUD</h3>
+      <p><code>Alt+Shift+C</code> toggles. A live pill shows the click count and pulses the target so you always know what's being hit.</p></div>
+    <div class="card feat"><i>🖱️</i><h3>Real OS clicks too</h3>
+      <p>Ships with a native CoreGraphics clicker for file pickers, permission sheets and game canvases that ignore synthetic events.</p></div>
+  </div>
+</div></section>
+
+<section id="install"><div class="wrap">
+  <h2>Install in 30 seconds</h2>
+  <p class="lede">Chrome only loads Web Store extensions automatically — everything else is a two-click developer load.</p>
+  <div class="steps">
+    <div class="card step"><div><h4>Download and unzip</h4>
+      <p><a href="/pin-and-click.zip" download style="color:var(--acc)">pin-and-click.zip</a> → unzip it anywhere you won't delete by accident.</p></div></div>
+    <div class="card step"><div><h4>Open the extensions page</h4>
+      <p>Go to <code>chrome://extensions</code> and turn on <b style="color:var(--ink)">Developer mode</b> (top-right toggle).</p></div></div>
+    <div class="card step"><div><h4>Load unpacked</h4>
+      <p>Click <b style="color:var(--ink)">Load unpacked</b>, select the unzipped folder, then pin ⚡ to your toolbar. Done.</p></div></div>
+    <div class="card step"><div><h4>Pick a target and go</h4>
+      <p>Open the popup → <b style="color:var(--ink)">🎯 Pick target on page</b> → click your button → <b style="color:var(--ink)">Start</b>. <code>Esc</code> cancels picking.</p></div></div>
+  </div>
+</div></section>
+
+<section id="native"><div class="wrap">
+  <h2>When synthetic clicks aren't enough</h2>
+  <p class="lede">
+    Browser extensions can only fire JavaScript events (<code>isTrusted: false</code>).
+    Normal web UIs accept them — file pickers, OS permission sheets and anti-cheat
+    game canvases don't. So the repo ships a native clicker that posts <em>real</em>
+    mouse events through CoreGraphics' HID tap.
+  </p>
+  <div class="card" style="padding:22px">
+<pre><code>./native/build.sh                     # compile (Xcode CLT)
+./native/nativeclick pick             # aim the pointer, get coords
+./native/nativeclick --at 812,455 --cps 50 --burst 25 --pause 500 --jitter</code></pre>
+    <p style="color:var(--dim);font-size:13.5px;margin:16px 0 0">
+      Same burst and jitter options. Move the mouse by hand to abort — your escape
+      hatch when 50/s makes the UI unusable.
+    </p>
+  </div>
+  <div class="card warn" style="margin-top:14px">
+    <b>Two honest caveats.</b> macOS gates synthetic input behind Accessibility, so you
+    must allow your terminal under Privacy&nbsp;&amp;&nbsp;Security → Accessibility once.
+    And OS-level clicks are inherently <b>coordinate</b>-based — there's no DOM down
+    there, so a button that moves is a button that's missed. The extension pins the
+    element; the native tool pins the point.
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <span>⚡ Pin &amp; Click — MIT licensed</span>
+  <a href="https://github.com/shubambhasin/pin-and-click">GitHub</a>
+  <a href="/pin-and-click.zip" download>Download</a>
+  <span class="sp">Use it on things you're allowed to click.</span>
+</div></footer>
+
+<script>
+(() => {
+  // The extension's real scheduler, running against a self-destroying button.
+  const $ = (id) => document.getElementById(id);
+  let clicks = 0, lost = 0, renders = 0, timer = null, running = false;
+  let inBurst = 0, pausing = false;
+  const cfg = { cps: 50, bs: 25, bp: 500, burst: true, jitter: false };
+  const target = { tag: 'button', text: 'Click me', point: null };
+
+  function render() {
+    renders++;
+    $('renders').textContent = renders;
+    $('host').innerHTML =
+      '<div class="r' + Math.floor(Math.random() * 9999) + '">' +
+      '<button id="hitbox" class="c' + Math.floor(Math.random() * 9999) + '">Click me</button></div>';
+    $('host').querySelector('button').addEventListener('click', () => {
+      clicks++;
+      $('count').firstChild.textContent = clicks;
+    });
+  }
+  render();
+  setInterval(render, 500);   // nuke + rebuild, forever
+
+  const visible = (el) => { if (!el || !el.isConnected) return false;
+    const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+
+  let cached = null;
+  function resolve() {                       // same 3-step fallback as the extension
+    if (visible(cached)) return cached;
+    const bySel = $('host').querySelector('button');
+    if (visible(bySel)) return (cached = bySel);
+    const byText = [...document.querySelectorAll(target.tag)]
+      .filter((e) => visible(e) && e.innerText.trim() === target.text);
+    if (byText.length) return (cached = byText[0]);
+    if (target.point) { const h = document.elementFromPoint(target.point.x, target.point.y);
+      if (visible(h)) return (cached = h); }
+    return null;
+  }
+
+  function fire(el) {
+    const r = el.getBoundingClientRect();
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const base = { bubbles: true, cancelable: true, composed: true, view: window,
+                   clientX: x, clientY: y, screenX: x, screenY: y, detail: 1, button: 0 };
+    const ptr = { ...base, pointerId: 1, pointerType: 'mouse', isPrimary: true, pressure: .5 };
+    el.dispatchEvent(new PointerEvent('pointerdown', { ...ptr, buttons: 1 }));
+    el.dispatchEvent(new MouseEvent('mousedown', { ...base, buttons: 1 }));
+    el.dispatchEvent(new PointerEvent('pointerup', { ...ptr, buttons: 0, pressure: 0 }));
+    el.dispatchEvent(new MouseEvent('mouseup', base));
+    el.dispatchEvent(new MouseEvent('click', base));
+  }
+
+  function nextDelay() {
+    let d = Math.max(4, 1000 / cfg.cps);
+    if (pausing) d = cfg.bp;
+    if (cfg.jitter) d *= 0.8 + Math.random() * 0.4;
+    return Math.max(1, Math.round(d));
+  }
+
+  function loop() {
+    const el = resolve();
+    if (el) {
+      target.point = (() => { const r = el.getBoundingClientRect();
+        return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) }; })();
+      fire(el);
+      el.classList.add('hot');
+    } else {
+      lost++; $('lost').textContent = lost;
+    }
+    pausing = cfg.burst && ++inBurst >= cfg.bs;
+    if (pausing) inBurst = 0;
+    timer = setTimeout(loop, nextDelay());
+  }
+
+  function avg() {
+    if (!cfg.burst) return 'steady ' + cfg.cps + '/s — likely to get coalesced';
+    const ms = (cfg.bs / cfg.cps) * 1000 + cfg.bp;
+    return '≈ ' + ((cfg.bs / ms) * 1000).toFixed(1) + ' clicks/s average';
+  }
+  const paint = () => { $('avg').textContent = avg(); };
+
+  $('run').onclick = () => {
+    running = !running;
+    if (running) { inBurst = 0; pausing = false; loop(); }
+    else { clearTimeout(timer); document.querySelectorAll('.hot').forEach(e => e.classList.remove('hot')); }
+    $('run').textContent = running ? 'Stop' : 'Start clicking';
+    $('run').style.background = running ? '#e5484d' : '';
+    $('run').style.color = running ? '#fff' : '';
+  };
+  const bind = (id, key, out, suffix = '') => {
+    $(id).oninput = (e) => { cfg[key] = +e.target.value; $(out).textContent = cfg[key] + suffix; paint(); };
+  };
+  bind('cps', 'cps', 'cpsOut'); bind('bs', 'bs', 'bsOut'); bind('bp', 'bp', 'bpOut');
+  $('burst').onchange = (e) => { cfg.burst = e.target.checked; paint(); };
+  $('jitter').onchange = (e) => { cfg.jitter = e.target.checked; paint(); };
+  paint();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+:root { color-scheme: light dark; }
+body { margin: 0; font: 13px/1.4 -apple-system, system-ui, sans-serif; }
+.wrap { width: 264px; padding: 12px; display: grid; gap: 9px; }
+.head { display: flex; align-items: center; gap: 6px; }
+.head b { font-size: 14px; }
+.state { margin-left: auto; font-size: 11px; opacity: 0.65; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: #9aa0a6; }
+.dot.on { background: #16b364; box-shadow: 0 0 0 3px rgba(22,179,100,.25); }
+.dot.pick { background: #2f6fed; }
+.btn { border: 0; border-radius: 8px; padding: 9px 10px; font-weight: 600; cursor: pointer; }
+.btn.primary { background: #16b364; color: #fff; font-size: 13px; }
+.btn.primary.stop { background: #e5484d; }
+.btn.primary:disabled { background: #c9ccd1; cursor: not-allowed; }
+.btn.ghost { background: #eef1f6; color: #1a1a1a; }
+.btn.tiny { background: transparent; color: #777; font-size: 11px; padding: 2px; }
+.target { font-size: 11px; padding: 7px 8px; border-radius: 7px; background: #f6f7f9; color: #444;
+  word-break: break-all; max-height: 54px; overflow: auto; }
+.row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.row input[type=range] { flex: 1; }
+output { width: 38px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.presets { display: flex; gap: 6px; }
+.presets button { flex: 1; border: 1px solid #d8dce3; background: transparent; border-radius: 6px;
+  padding: 4px 0; font-size: 11px; cursor: pointer; color: inherit; }
+.hint { font-size: 10px; opacity: 0.55; text-align: center; }
+@media (prefers-color-scheme: dark) {
+  body { background: #1e1f22; color: #e8e8e8; }
+  .btn.ghost { background: #2c2e33; color: #e8e8e8; }
+  .target { background: #26282d; color: #c9ccd1; }
+  .presets button { border-color: #3a3d44; }
+}
+
+.opts { display: grid; gap: 6px; padding: 8px; border-radius: 7px; background: #f6f7f9; }
+.chk { display: flex; align-items: center; gap: 5px; font-size: 11px; flex-wrap: wrap; }
+.chk input[type=number] { width: 46px; padding: 2px 4px; font-size: 11px; border: 1px solid #d8dce3;
+  border-radius: 5px; background: transparent; color: inherit; }
+.eff { font-size: 10px; opacity: 0.6; }
+@media (prefers-color-scheme: dark) {
+  .opts { background: #26282d; }
+  .chk input[type=number] { border-color: #3a3d44; }
+}

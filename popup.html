@@ -1,0 +1,46 @@
+<!doctype html>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="popup.css" />
+<div class="wrap">
+  <div class="head">
+    <span class="dot" id="dot"></span>
+    <b>Pin &amp; Click</b>
+    <span class="state" id="state">idle</span>
+  </div>
+
+  <button id="pick" class="btn ghost">🎯 Pick target on page</button>
+  <div class="target" id="target">No target selected</div>
+
+  <label class="row">
+    <span>Speed</span>
+    <input type="range" id="cps" min="1" max="100" step="1" value="50" />
+    <output id="cpsOut">50/s</output>
+  </label>
+  <div class="presets">
+    <button data-cps="10">10</button>
+    <button data-cps="25">25</button>
+    <button data-cps="50">50</button>
+    <button data-cps="100">100</button>
+  </div>
+
+  <div class="opts">
+    <label class="chk">
+      <input type="checkbox" id="burst" checked />
+      <span>Pause after every</span>
+      <input type="number" id="burstSize" min="1" max="9999" value="25" />
+      <span>clicks for</span>
+      <input type="number" id="burstPause" min="0" max="60000" step="50" value="500" />
+      <span>ms</span>
+    </label>
+    <label class="chk">
+      <input type="checkbox" id="jitter" />
+      <span>Jitter gaps ±20% (less bot-like)</span>
+    </label>
+    <div class="eff" id="eff"></div>
+  </div>
+
+  <button id="toggle" class="btn primary" disabled>Start clicking</button>
+  <button id="clear" class="btn tiny">Clear target</button>
+  <div class="hint">Esc cancels picking · Alt+Shift+C toggles</div>
+</div>
+<script src="popup.js"></script>
