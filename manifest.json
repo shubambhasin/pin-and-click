@@ -2,18 +2,22 @@
   "manifest_version": 3,
   "name": "Pin & Click \u2014 Fast Auto Clicker",
   "version": "1.0.0",
-  "description": "Pick any element once, then auto-click it up to 100x/sec \u2014 survives DOM changes and page reloads.",
+  "description": "Pin a button once, then auto-click it up to 100x/sec. Chain buttons into a sequence and set when it should stop.",
   "permissions": [
-    "storage",
-    "scripting",
-    "activeTab"
+    "storage"
   ],
   "host_permissions": [
     "<all_urls>"
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Pin & Click"
+    "default_title": "Pin & Click",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
   },
   "content_scripts": [
     {
@@ -40,5 +44,11 @@
       },
       "description": "Start/stop auto-clicking on the current tab"
     }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   }
 }

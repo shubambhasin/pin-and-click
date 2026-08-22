@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Privacy Policy — Pin &amp; Click</title>
+<meta name="description" content="Pin & Click collects nothing, sends nothing, and has no servers. Everything it stores stays in your browser." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+<style>
+  :root { --bg:#0b0c0f; --panel:#14161b; --line:#23262e; --ink:#f2f4f8; --dim:#9ba3b0; --acc:#16b364; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.65 -apple-system,BlinkMacSystemFont,system-ui,sans-serif; }
+  .wrap { max-width:760px; margin:0 auto; padding:56px 22px 80px; }
+  a { color:#3ddc8c; }
+  h1 { font-size:clamp(28px,5vw,40px); letter-spacing:-1.1px; margin:0 0 6px; font-weight:800; }
+  .updated { color:var(--dim); font-size:13.5px; margin:0 0 34px; }
+  h2 { font-size:19px; margin:34px 0 8px; letter-spacing:-.3px; }
+  p, li { color:#cdd3db; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:20px 22px; margin:22px 0; }
+  .card.big { border-left:3px solid var(--acc); }
+  .card.big b { color:var(--ink); font-size:17px; }
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:14.5px; }
+  th, td { text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--dim); font-weight:650; font-size:12.5px; text-transform:uppercase; letter-spacing:.5px; }
+  code { font:500 13px ui-monospace,SFMono-Regular,Menlo,monospace; background:#1e222a;
+    border:1px solid var(--line); padding:1px 5px; border-radius:5px; color:#cfe9db; }
+  footer { margin-top:44px; padding-top:22px; border-top:1px solid var(--line); color:#6f7783; font-size:13.5px; }
+</style>
+</head>
+<body><div class="wrap">
+
+<h1>Privacy Policy</h1>
+<p class="updated">Pin &amp; Click · last updated 22 August 2026</p>
+
+<div class="card big">
+  <b>Pin &amp; Click collects nothing, sends nothing, and has no servers.</b>
+  <p style="margin:8px 0 0">There is no analytics, no tracking, no account, and no network
+  request of any kind. The extension has no code that talks to a remote server — yours or
+  anyone else's. You can verify that yourself: the
+  <a href="https://github.com/shubambhasin/pin-and-click">entire source is public</a>.</p>
+</div>
+
+<h2>What it stores, and where</h2>
+<p>To remember the button you picked, the extension saves a small record in your browser's
+own extension storage (<code>chrome.storage.local</code>), keyed to the page you set it up on:</p>
+
+<table>
+  <tr><th>Stored</th><th>Why</th></tr>
+  <tr><td>A CSS selector, tag name and visible text of each button you picked</td>
+      <td>To find that button again after the page re-renders or reloads</td></tr>
+  <tr><td>The last on-screen position of each button</td>
+      <td>A fallback for finding it when the selector and text both fail</td></tr>
+  <tr><td>Your settings: speed, pause size, jitter, stop condition</td>
+      <td>So you don't have to set them again</td></tr>
+</table>
+
+<p>This data never leaves your device. It is not transmitted, shared, or sold. It sits in
+your browser profile until you remove the target, clear it, or uninstall the extension —
+uninstalling deletes it along with the extension.</p>
+
+<h2>What it does not do</h2>
+<ul>
+  <li>No browsing history, page content, form data, or keystrokes are read or recorded.</li>
+  <li>No personal or financial information is accessed.</li>
+  <li>No data is sent anywhere — there is no server, endpoint, or third party involved.</li>
+  <li>Nothing is used for advertising, profiling, or creditworthiness.</li>
+</ul>
+
+<h2>Why it asks to run on any site</h2>
+<p>You can pin a button on any page, so the extension has to be able to run on the page
+you're on. That's the whole reason for the broad site access — it reads the page only to
+locate the element you chose, and only in the tab where you set one up.</p>
+
+<h2>Contact</h2>
+<p>Questions or a problem? Open an issue at
+<a href="https://github.com/shubambhasin/pin-and-click/issues">github.com/shubambhasin/pin-and-click</a>.</p>
+
+<footer>
+  ⚡ <a href="/">Pin &amp; Click</a> · MIT licensed · no trackers, no servers, no accounts
+</footer>
+</div></body>
+</html>

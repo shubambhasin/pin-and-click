@@ -9,12 +9,19 @@ set -e
 cd "$(dirname "$0")/.."
 
 FILES="manifest.json content.js content.css popup.html popup.css popup.js background.js README.md"
+ICONS="icon16.png icon32.png icon48.png icon128.png"
 STAGE=$(mktemp -d)
-mkdir -p "$STAGE/pin-and-click"
+mkdir -p "$STAGE/pin-and-click/icons"
 
 for f in $FILES; do
   [ -f "$f" ] || { echo "✗ missing $f"; exit 1; }
   cp "$f" "$STAGE/pin-and-click/"
+done
+
+# the manifest references these, so a zip without them won't load at all
+for i in $ICONS; do
+  [ -f "icons/$i" ] || { echo "✗ missing icons/$i"; exit 1; }
+  cp "icons/$i" "$STAGE/pin-and-click/icons/"
 done
 
 mkdir -p site

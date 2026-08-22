@@ -141,3 +141,24 @@ OS-level clicks are inherently **coordinate**-based — there is no DOM down the
 so a button that moves is a target that's missed. The extension pins the
 *element*; the native tool pins the *point*. Use the extension for web UIs that
 re-render, the native tool for everything that won't accept synthetic events.
+
+---
+
+## Publishing to the Chrome Web Store
+
+`store/LISTING.md` holds every dashboard field ready to paste — name, summary, detailed
+description, single-purpose statement, permission justifications, and the privacy
+declarations. Assets:
+
+- `icons/icon{16,32,48,128}.png` — generated from `icons/icon.svg` (and `icon-small.svg`,
+  a simplified version that stays legible at 16px)
+- `store/shots/*.png` — five 1280x800 screenshots, regenerate with
+  `python3 store/build-shots.py`. They are composed from the extension's real `popup.css`,
+  so they can't drift into advertising a UI that doesn't exist.
+- `site/pin-and-click.zip` — the upload, built by `./scripts/build-zip.sh`
+
+Privacy policy lives at [/privacy.html](https://pin-and-click.vercel.app/privacy.html) —
+the store requires a hosted URL.
+
+Registering as a Chrome Web Store developer costs a one-time US$5 and needs a Google
+account, so the final submit is a manual step.

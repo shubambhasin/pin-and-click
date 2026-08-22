@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1fd47c"/>
+      <stop offset="1" stop-color="#0f9b57"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#g)"/>
+  <!-- click pulses: two arcs radiating from the cursor tip -->
+  <g fill="none" stroke="#06301c" stroke-linecap="round" opacity=".55">
+    <path d="M84 30 a30 30 0 0 1 16 16" stroke-width="8"/>
+    <path d="M92 18 a46 46 0 0 1 24 24" stroke-width="8" opacity=".65"/>
+  </g>
+  <!-- cursor arrow -->
+  <path d="M38 24 L38 96 L57 78 L69 106 L84 99 L71 71 L96 68 Z"
+        fill="#ffffff" stroke="#06301c" stroke-width="6" stroke-linejoin="round"/>
+</svg>
