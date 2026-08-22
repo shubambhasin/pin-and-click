@@ -79,14 +79,16 @@ Use it on things you are allowed to click.
 
 ### Graphic assets
 
-| Asset | Requirement | File |
-| --- | --- | --- |
-| Store icon | 128x128 PNG | `icons/icon128.png` |
-| Screenshot 1 | 1280x800 PNG | `store/shots/1-pins-the-element.png` |
-| Screenshot 2 | 1280x800 PNG | `store/shots/2-sequences.png` |
-| Screenshot 3 | 1280x800 PNG | `store/shots/3-burst-mode.png` |
-| Screenshot 4 | 1280x800 PNG | `store/shots/4-stop-conditions.png` |
-| Screenshot 5 | 1280x800 PNG | `store/shots/5-sent-vs-skipped.png` |
+| Asset | Requirement | File | Preview |
+| --- | --- | --- | --- |
+| Store icon | 128x128 PNG | `icons/icon128.png` | <img src="../icons/icon128.png" width="48"> |
+| Screenshot 1 | 1280x800 PNG | `store/shots/1-pins-the-element.png` | <img src="shots/1-pins-the-element.png" width="220"> |
+| Screenshot 2 | 1280x800 PNG | `store/shots/2-sequences.png` | <img src="shots/2-sequences.png" width="220"> |
+| Screenshot 3 | 1280x800 PNG | `store/shots/3-burst-mode.png` | <img src="shots/3-burst-mode.png" width="220"> |
+| Screenshot 4 | 1280x800 PNG | `store/shots/4-stop-conditions.png` | <img src="shots/4-stop-conditions.png" width="220"> |
+| Screenshot 5 | 1280x800 PNG | `store/shots/5-sent-vs-skipped.png` | <img src="shots/5-sent-vs-skipped.png" width="220"> |
+
+Upload them to the dashboard in this order — screenshot 1 is the one users see first.
 
 Small promo tile (440x280) is optional and only needed to be featured — skipped.
 

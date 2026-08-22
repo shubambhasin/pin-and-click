@@ -1,7 +1,4 @@
-<h1>
-  <img src="icons/icon48.png" width="28" height="28" align="top" alt="">
-  Pin &amp; Click — fast auto clicker (Chrome MV3)
-</h1>
+# Pin & Click — fast auto clicker (Chrome MV3)
 
 **→ [pin-and-click.vercel.app](https://pin-and-click.vercel.app)** — landing page with a live
 in-browser demo of the click scheduler, and a one-click `.zip` download.
@@ -9,36 +6,6 @@ in-browser demo of the click scheduler, and a one-click `.zip` download.
 Pick an element once, then click it up to 100×/second. The target is re-resolved
 on **every** tick, so it keeps working when the page re-renders the button as a
 brand-new DOM node, or reloads entirely.
-
-![Pins the element, not the pixel](store/shots/1-pins-the-element.png)
-
-## What it looks like
-
-<table>
-  <tr>
-    <td width="50%"><a href="store/shots/2-sequences.png"><img src="store/shots/2-sequences.png" alt="Chain buttons into a sequence"></a></td>
-    <td width="50%"><a href="store/shots/3-burst-mode.png"><img src="store/shots/3-burst-mode.png" alt="Bursts, so the clicks actually land"></a></td>
-  </tr>
-  <tr>
-    <td><b>Sequences.</b> Pin several buttons and they run top to bottom, then loop. A step
-    that isn't on the page yet is waited for, not skipped.</td>
-    <td><b>Burst mode.</b> A flat 50/s stream gets coalesced by the page and rate-limited by
-    the backend, so clicks go out in batches with a breather between them.</td>
-  </tr>
-  <tr>
-    <td><a href="store/shots/4-stop-conditions.png"><img src="store/shots/4-stop-conditions.png" alt="Tell it when to stop"></a></td>
-    <td><a href="store/shots/5-sent-vs-skipped.png"><img src="store/shots/5-sent-vs-skipped.png" alt="See what didn't land"></a></td>
-  </tr>
-  <tr>
-    <td><b>Stop conditions.</b> After N clicks or seconds, when text like <code>Sold out</code>
-    appears, or when the button disappears — and it tells you which one ended it.</td>
-    <td><b>Sent vs skipped.</b> When a button is covered by a modal or disabled, a real click
-    wouldn't land either — so those are counted apart, with the reason.</td>
-  </tr>
-</table>
-
-> The screenshots are generated from the extension's real `popup.css` by
-> `python3 store/build-shots.py`, so they can't drift into showing a UI that doesn't exist.
 
 ## Repo layout & deploys
 
