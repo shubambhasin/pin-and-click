@@ -200,5 +200,61 @@ declarations. Assets:
 Privacy policy lives at [/privacy.html](https://pin-and-click.vercel.app/privacy.html) —
 the store requires a hosted URL.
 
+## Publishing automatically
+
+Releases are triggered by the **manifest version**, not by every commit — the store
+rejects an upload that isn't higher than what's live, and every publish enters Google's
+review queue. So:
+
+```sh
+npm run bump          # 1.0.0 -> 1.0.1  (or: npm run bump -- minor)
+git commit -am "..." && git push
+```
+
+`.github/workflows/publish-extension.yml` sees the version change, builds the zip, uploads
+it and submits for review. If the version is unchanged it skips with a note, so ordinary
+commits are safe. You can also run it by hand from the Actions tab, with a **draft** option
+that uploads without submitting.
+
+Publishing locally works the same way: `npm run publish:store` (add `-- --draft` to hold it).
+
+### One-time credentials
+
+Four repo secrets (Settings → Secrets and variables → Actions):
+
+| secret | where it comes from |
+| --- | --- |
+| `CWS_EXTENSION_ID` | `opdneecbdmlcmcmlkfggdjfhedkandop` |
+| `CWS_CLIENT_ID` | Google Cloud OAuth client (Desktop app) |
+| `CWS_CLIENT_SECRET` | same client |
+| `CWS_REFRESH_TOKEN` | exchanged once, below |
+
+1. [console.cloud.google.com](https://console.cloud.google.com) → new project → **APIs &
+   Services → Library** → enable **Chrome Web Store API**.
+2. **OAuth consent screen** → External → add yourself as a test user.
+3. **Credentials → Create credentials → OAuth client ID → Desktop app** → copy the id and
+   secret.
+4. Get a refresh token — open this in a browser (substituting your client id), approve, and
+   copy the `code=` value out of the redirected URL:
+
+   ```
+   https://accounts.google.com/o/oauth2/auth?response_type=code&scope=https://www.googleapis.com/auth/chromewebstore&client_id=YOUR_CLIENT_ID&redirect_uri=urn:ietf:wg:oauth:2.0:oob&access_type=offline&prompt=consent
+   ```
+
+   ```sh
+   curl -s https://oauth2.googleapis.com/token      -d client_id=YOUR_CLIENT_ID -d client_secret=YOUR_CLIENT_SECRET      -d code=THE_CODE -d grant_type=authorization_code      -d redirect_uri=urn:ietf:wg:oauth:2.0:oob
+   ```
+
+   The `refresh_token` in the response is `CWS_REFRESH_TOKEN`. It's long-lived, but Google
+   expires refresh tokens for apps left in "Testing" after 7 days — publish the consent
+   screen, or expect to redo this step.
+
+### What "published" actually means
+
+The API call submits for review; it does not make the new version live. Review can take
+hours to days, and the previous version stays live until it passes. A rejection arrives by
+email — the workflow will have reported success, because the upload and the submission both
+succeeded.
+
 Registering as a Chrome Web Store developer costs a one-time US$5 and needs a Google
-account, so the final submit is a manual step.
+account, so the *first* submit is a manual step.

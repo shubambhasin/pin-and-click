@@ -1,0 +1,77 @@
+name: Publish to Chrome Web Store
+
+# Deliberately NOT on every commit. The store rejects an upload unless the
+# version is higher than what is live, and every publish goes through Google's
+# review queue — so a release is triggered by bumping the manifest version.
+#
+#   npm run bump   ->  commit  ->  push  ->  this publishes
+#
+# Or run it by hand from the Actions tab (optionally as a draft).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'manifest.json'
+      - '*.js'
+      - '*.css'
+      - 'popup.html'
+      - 'icons/**'
+  workflow_dispatch:
+    inputs:
+      draft:
+        description: 'Upload only, do not submit for review'
+        type: boolean
+        default: false
+
+concurrency:
+  group: cws-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2          # need the previous commit to compare versions
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Decide whether the version changed
+        id: check
+        run: |
+          NOW=$(node -p "require('./manifest.json').version")
+          BEFORE=$(git show HEAD~1:manifest.json 2>/dev/null | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).version" 2>/dev/null || echo "none")
+          echo "current=$NOW"  >> "$GITHUB_OUTPUT"
+          echo "previous=$BEFORE" >> "$GITHUB_OUTPUT"
+          if [ "$NOW" != "$BEFORE" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "publish=yes" >> "$GITHUB_OUTPUT"
+            echo "::notice::Publishing $BEFORE -> $NOW"
+          else
+            echo "publish=no" >> "$GITHUB_OUTPUT"
+            echo "::notice::manifest version unchanged ($NOW) — skipping. Run 'npm run bump' to release."
+          fi
+
+      - name: Upload and publish
+        if: steps.check.outputs.publish == 'yes'
+        env:
+          CWS_EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
+          CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
+          CWS_CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
+          CWS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
+        run: |
+          node scripts/publish-store.mjs ${{ inputs.draft && '--draft' || '' }}
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Chrome Web Store"
+            echo ""
+            echo "- previous version: \`${{ steps.check.outputs.previous }}\`"
+            echo "- this version: \`${{ steps.check.outputs.current }}\`"
+            echo "- published: **${{ steps.check.outputs.publish }}**"
+          } >> "$GITHUB_STEP_SUMMARY"

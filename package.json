@@ -1,0 +1,11 @@
+{
+  "name": "pin-and-click",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "bump": "node scripts/bump-version.mjs",
+    "zip": "./scripts/build-zip.sh",
+    "og": "python3 scripts/build-og.py",
+    "publish:store": "node scripts/publish-store.mjs"
+  }
+}
