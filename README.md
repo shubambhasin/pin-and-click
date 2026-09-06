@@ -190,6 +190,8 @@ declarations. Assets:
 
 - `icons/icon{16,32,48,128}.png` — generated from `icons/icon.svg` (and `icon-small.svg`,
   a simplified version that stays legible at 16px)
+- `site/og.png` — the 1200x630 social card shown when the site is shared; regenerate with
+  `python3 scripts/build-og.py`
 - `store/shots/*.png` — five 1280x800 screenshots, regenerate with
   `python3 store/build-shots.py`. They are composed from the extension's real `popup.css`,
   so they can't drift into advertising a UI that doesn't exist.
