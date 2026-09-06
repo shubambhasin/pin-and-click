@@ -1,3 +1,5 @@
+**Published:** https://chromewebstore.google.com/detail/opdneecbdmlcmcmlkfggdjfhedkandop
+
 # Chrome Web Store listing — Pin & Click
 
 Everything below is ready to paste into the Developer Dashboard, field by field.

@@ -3,8 +3,9 @@
   Pin &amp; Click — fast auto clicker (Chrome MV3)
 </h1>
 
+**→ [Add to Chrome](https://chromewebstore.google.com/detail/opdneecbdmlcmcmlkfggdjfhedkandop)** — live on the Chrome Web Store.
 **→ [pin-and-click.vercel.app](https://pin-and-click.vercel.app)** — landing page with a live
-in-browser demo of the click scheduler, and a one-click `.zip` download.
+in-browser demo of the click scheduler.
 
 Pick an element once, then click it up to 100×/second. The target is re-resolved
 on **every** tick, so it keeps working when the page re-renders the button as a
@@ -56,6 +57,10 @@ site updates itself; no token is stored anywhere. Run the same script locally to
 identical zip for `Load unpacked`.
 
 ## Install
+
+**[Add to Chrome](https://chromewebstore.google.com/detail/opdneecbdmlcmcmlkfggdjfhedkandop)** — one click, no developer mode.
+
+Or load it unpacked from source:
 1. `chrome://extensions` → enable **Developer mode**
 2. **Load unpacked** → select this folder
 3. Pin the extension to the toolbar
